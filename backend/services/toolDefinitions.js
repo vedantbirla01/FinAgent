@@ -77,6 +77,23 @@ const toolDefinitions = [
       },
     },
   },
+  {
+    type: 'function',
+    function: {
+      name: 'searchFinancialTips',
+      description: 'Search a curated knowledge base for relevant financial advice and budgeting tips. Use this when the user asks for advice, tips, or how to save money — not for retrieving their personal transaction data.',
+      parameters: {
+        type: 'object',
+        properties: {
+          query: {
+            type: 'string',
+            description: "The user's question or topic to search tips for.",
+          },
+        },
+        required: ['query'],
+      },
+    },
+  },
 ];
 
 export default toolDefinitions;

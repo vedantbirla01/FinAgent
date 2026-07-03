@@ -1,5 +1,6 @@
 import asyncHandler from 'express-async-handler';
-import runSingleTurn from '../services/chatService.js';
+import runAgent from '../services/agentService.js';
+import Conversation from '../models/Conversation.js';
 
 const sendMessage = asyncHandler(async (req, res) => {
   const { message } = req.body;
@@ -9,8 +10,13 @@ const sendMessage = asyncHandler(async (req, res) => {
     throw new Error('Message is required');
   }
 
-  const result = await runSingleTurn(req.user._id, message);
+  const result = await runAgent(req.user._id, message);
   res.json(result);
 });
 
-export { sendMessage };
+const getHistory = asyncHandler(async (req, res) => {
+  const conversation = await Conversation.findOne({ user: req.user._id });
+  res.json(conversation ? conversation.messages : []);
+});
+
+export { sendMessage, getHistory };

@@ -1,4 +1,13 @@
 import Transaction from '../models/Transaction.js';
+import searchFinancialTips from './ragService.js';
+
+const searchTips = async (userId, { query }) => {
+  const results = await searchFinancialTips(query);
+  return {
+    query,
+    tips: results,
+  };
+};
 
 const addExpense = async (userId, { amount, category, description }) => {
   const transaction = await Transaction.create({
@@ -119,6 +128,7 @@ const toolImplementations = {
   addIncome,
   getBalance,
   getSummary,
+  searchFinancialTips: searchTips
 };
 
 export default toolImplementations;
