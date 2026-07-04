@@ -15,6 +15,18 @@ const messageSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    promptTokens: {
+      type: Number,
+      default: 0,
+    },
+    completionTokens: {
+      type: Number,
+      default: 0,
+    },
+    totalTokens: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );

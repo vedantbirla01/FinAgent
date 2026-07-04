@@ -9,7 +9,11 @@ You can call tools to record transactions or fetch real data. Never make up numb
 If a question requires multiple pieces of information (e.g. comparing two time periods, or a data question plus a tips question), call tools one at a time and use each result before deciding your next step.
 Once you have everything you need, give a concise, friendly final answer. Do not call a tool if you already have the answer from a previous tool result in this conversation.
 
-When you call a tool, you must always output valid JSON arguments that exactly match that tool's parameter schema — correct field names, correct types (numbers as numbers, not strings), and all required fields included. Never output a bare string, partial JSON, or free text as a tool argument. If a required parameter is a string (like a search query), wrap it in a proper JSON object, e.g. {"query": "saving tips"} — never output just the string alone.`;
+When you call a tool, you must always output valid JSON arguments that exactly match that tool's parameter schema — correct field names, correct types (numbers as numbers, not strings), and all required fields included. Never output a bare string, partial JSON, or free text as a tool argument. If a required parameter is a string (like a search query), wrap it in a proper JSON object, e.g. {"query": "saving tips"} — never output just the string alone.
+
+STRICT RULE ON NUMBERS: All financial amounts must come directly from tool results. Never calculate, estimate, infer, sum, subtract, or invent balances, totals, expenses, category totals, or income yourself — even simple-seeming arithmetic like adding two amounts together. If a tool provides a numeric value (e.g. balance, total, amount), state that exact value as returned, in the same currency and precision — do not round, combine, or recompute it.
+If the user's question requires a number that is a combination of multiple things (e.g. "what's my total spending across fuel and groceries"), call the appropriate tool (such as getSummary or getBalance) that returns that combined figure directly — do not add up individual tool results yourself in your final answer.
+If no tool result contains the exact number needed to answer accurately, say so explicitly and either call another tool or ask the user for clarification — do not fill the gap with your own estimate.`;
 
 const MAX_ITERATIONS = 5;
 const HISTORY_LIMIT = 10;
@@ -80,6 +84,7 @@ const runAgent = async (userId, userMessage) => {
   const contextMessages = buildContextMessages(conversation);
 
   const trace = [];
+  const usage = { promptTokens: 0, completionTokens: 0, totalTokens: 0 };
 
   const loopMessages = [
     { role: 'system', content: SYSTEM_PROMPT },
@@ -100,6 +105,12 @@ const runAgent = async (userId, userMessage) => {
         "I had trouble processing part of that request. Could you try rephrasing it, or asking one thing at a time?";
       trace.push({ step: iteration, type: 'tool_use_failed_after_retry' });
       break;
+    }
+
+    if (completion.usage) {
+      usage.promptTokens += completion.usage.prompt_tokens || 0;
+      usage.completionTokens += completion.usage.completion_tokens || 0;
+      usage.totalTokens += completion.usage.total_tokens || 0;
     }
 
     const responseMessage = completion.choices[0].message;
@@ -151,17 +162,21 @@ const runAgent = async (userId, userMessage) => {
     role: 'assistant',
     content: finalReply,
     toolName: toolsUsed || null,
+    promptTokens: usage.promptTokens,
+    completionTokens: usage.completionTokens,
+    totalTokens: usage.totalTokens,
   });
   await conversation.save();
 
   console.log(`\n--- ReAct trace (${iteration} iteration(s)) ---`);
   console.log(JSON.stringify(trace, null, 2));
-  console.log('--- end trace ---\n');
+  console.log(`--- token usage: ${usage.totalTokens} total (${usage.promptTokens} prompt + ${usage.completionTokens} completion) ---\n`);
 
   return {
     reply: finalReply,
     trace,
     iterations: iteration,
+    usage,
   };
 };
 
