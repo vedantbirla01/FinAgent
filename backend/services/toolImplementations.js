@@ -1,15 +1,8 @@
 import Transaction from '../models/Transaction.js';
 import searchFinancialTips from './ragService.js';
 
-const searchTips = async (userId, { query }) => {
-  const results = await searchFinancialTips(query);
-  return {
-    query,
-    tips: results,
-  };
-};
-
-const addExpense = async (userId, { amount, category, description }) => {
+const addExpense = async (userId, args) => {
+  const { amount, category, description } = args || {};
   const transaction = await Transaction.create({
     user: userId,
     type: 'expense',
@@ -29,7 +22,8 @@ const addExpense = async (userId, { amount, category, description }) => {
   };
 };
 
-const addIncome = async (userId, { amount, category, description }) => {
+const addIncome = async (userId, args) => {
+  const { amount, category, description } = args || {};
   const transaction = await Transaction.create({
     user: userId,
     type: 'income',
@@ -90,7 +84,8 @@ const getDateRangeForPeriod = (period) => {
   return { start, end };
 };
 
-const getSummary = async (userId, { period } = {}) => {
+const getSummary = async (userId, args) => {
+  const { period } = args || {};
   const range = getDateRangeForPeriod(period || 'this_month');
 
   const match = { user: userId, type: 'expense' };
@@ -123,12 +118,21 @@ const getSummary = async (userId, { period } = {}) => {
   };
 };
 
+const searchTips = async (userId, args) => {
+  const { query } = args || {};
+  const results = await searchFinancialTips(query);
+  return {
+    query,
+    tips: results,
+  };
+};
+
 const toolImplementations = {
   addExpense,
   addIncome,
   getBalance,
   getSummary,
-  searchFinancialTips: searchTips
+  searchFinancialTips: searchTips,
 };
 
 export default toolImplementations;
