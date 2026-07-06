@@ -3,8 +3,8 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 function BudgetBarChart({ data }) {
   if (!data || data.length === 0) {
     return (
-      <div className="h-64 flex items-center justify-center text-slate-500 text-sm">
-        No budgets set yet.
+      <div className="h-64 flex items-center justify-center text-muted text-sm font-mono">
+        no budgets set yet.
       </div>
     );
   }
@@ -12,13 +12,13 @@ function BudgetBarChart({ data }) {
   return (
     <ResponsiveContainer width="100%" height={260}>
       <BarChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-        <XAxis dataKey="category" stroke="#94a3b8" fontSize={12} />
-        <YAxis stroke="#94a3b8" fontSize={12} />
-        <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: 8, color: '#fff' }} />
-        <Legend />
-        <Bar dataKey="budget" fill="#6366f1" name="Budget" radius={[4, 4, 0, 0]} />
-        <Bar dataKey="actual" fill="#ec4899" name="Actual" radius={[4, 4, 0, 0]} />
+        <CartesianGrid strokeDasharray="3 3" stroke="#253252" />
+        <XAxis dataKey="category" stroke="#8891a5" fontSize={11} fontFamily="JetBrains Mono, monospace" />
+        <YAxis stroke="#8891a5" fontSize={11} fontFamily="JetBrains Mono, monospace" />
+        <Tooltip contentStyle={{ backgroundColor: '#111a2e', border: '1px solid #253252', borderRadius: 8, color: '#e8ecf3', fontFamily: 'JetBrains Mono, monospace', fontSize: 12 }} />
+        <Legend wrapperStyle={{ fontSize: 12, fontFamily: 'Inter, sans-serif' }} />
+        <Bar dataKey="budget" fill="#d4a857" name="Budget" radius={[4, 4, 0, 0]} />
+        <Bar dataKey="actual" fill="#fb7185" name="Actual" radius={[4, 4, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
   );

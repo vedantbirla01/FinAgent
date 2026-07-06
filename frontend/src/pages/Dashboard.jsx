@@ -1,18 +1,17 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { useAuth } from '../context/useAuth.js';
+import { Link } from 'react-router-dom';
 import api from '../api/axios.js';
 import CategoryPieChart from '../components/charts/CategoryPieChart.jsx';
 import MonthlyTrendChart from '../components/charts/MonthlyTrendChart.jsx';
 import BudgetBarChart from '../components/charts/BudgetBarChart.jsx';
+import { Wallet, MessageSquare, LogOut } from 'lucide-react';
 
 function Dashboard() {
   const { user, logout } = useAuth();
-
   const [categoryData, setCategoryData] = useState([]);
   const [trendData, setTrendData] = useState([]);
   const [budgetData, setBudgetData] = useState([]);
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -23,14 +22,12 @@ function Dashboard() {
   const loadDashboardData = async () => {
     setLoading(true);
     setError('');
-
     try {
       const [categoryRes, trendRes, budgetRes] = await Promise.all([
         api.get('/analytics/category-summary'),
         api.get('/analytics/monthly-trend'),
         api.get('/analytics/budget-vs-actual'),
       ]);
-
       setCategoryData(categoryRes.data);
       setTrendData(trendRes.data);
       setBudgetData(budgetRes.data);
@@ -47,20 +44,15 @@ function Dashboard() {
 
   const handleSetBudget = async (e) => {
     e.preventDefault();
-
     if (!budgetCategory || !budgetLimit) return;
-
     setSavingBudget(true);
-
     try {
       await api.post('/budgets', {
         category: budgetCategory,
         monthlyLimit: Number(budgetLimit),
       });
-
       setBudgetCategory('');
       setBudgetLimit('');
-
       await loadDashboardData();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to save budget');
@@ -70,104 +62,83 @@ function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 px-4 py-8">
+    <div className="min-h-screen bg-ink px-4 py-6">
       <div className="max-w-5xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-white">
-              Dashboard
-            </h1>
-
-            <p className="text-slate-400 text-sm">
-              Logged in as{' '}
-              <span className="text-slate-300">
-                {user?.name}
-              </span>
-            </p>
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-md bg-gold/10 border border-gold/30 flex items-center justify-center">
+              <Wallet size={16} className="text-gold" />
+            </div>
+            <div>
+              <h1 className="font-display font-semibold text-lg leading-tight">Dashboard</h1>
+              <p className="text-muted text-xs leading-tight">{user?.name}</p>
+            </div>
           </div>
-
-          <div className="flex gap-3">
+          <div className="flex gap-2">
             <Link
               to="/chat"
-              className="text-sm bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition-colors"
+              className="flex items-center gap-1.5 text-xs text-muted hover:text-text bg-panel-light hover:bg-border border border-border px-3 py-1.5 rounded-lg transition-colors"
             >
-              Chat
+              <MessageSquare size={13} /> Chat
             </Link>
-
             <button
               onClick={logout}
-              className="text-sm bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition-colors"
+              className="flex items-center gap-1.5 text-xs text-muted hover:text-text bg-panel-light hover:bg-border border border-border px-3 py-1.5 rounded-lg transition-colors"
             >
-              Log out
+              <LogOut size={13} /> Log out
             </button>
           </div>
         </div>
 
         {error && (
-          <div className="mb-4 text-sm text-red-400 bg-red-950/50 border border-red-900 rounded-lg px-3 py-2">
+          <div className="mb-4 text-sm text-rose bg-rose/10 border border-rose/30 rounded-lg px-3 py-2">
             {error}
           </div>
         )}
 
         {loading ? (
-          <p className="text-slate-400">
-            Loading dashboard...
-          </p>
+          <p className="text-muted text-sm font-mono">loading dashboard…</p>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-slate-800 rounded-xl p-6">
-              <h2 className="text-white font-semibold mb-2">
-                Spending by Category (This Month)
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div className="bg-panel border border-border rounded-2xl p-6">
+              <h2 className="font-display text-sm font-semibold mb-3 text-muted uppercase tracking-wide">
+                Spending by Category
               </h2>
-
               <CategoryPieChart data={categoryData} />
             </div>
 
-            <div className="bg-slate-800 rounded-xl p-6">
-              <h2 className="text-white font-semibold mb-2">
-                6-Month Income vs Expense Trend
+            <div className="bg-panel border border-border rounded-2xl p-6">
+              <h2 className="font-display text-sm font-semibold mb-3 text-muted uppercase tracking-wide">
+                6-Month Trend
               </h2>
-
               <MonthlyTrendChart data={trendData} />
             </div>
 
-            <div className="bg-slate-800 rounded-xl p-6 lg:col-span-2">
-              <h2 className="text-white font-semibold mb-2">
-                Budget vs Actual (This Month)
+            <div className="bg-panel border border-border rounded-2xl p-6 lg:col-span-2">
+              <h2 className="font-display text-sm font-semibold mb-3 text-muted uppercase tracking-wide">
+                Budget vs Actual
               </h2>
-
               <BudgetBarChart data={budgetData} />
             </div>
 
-            <div className="bg-slate-800 rounded-xl p-6 lg:col-span-2">
-              <h2 className="text-white font-semibold mb-4">
-                Set a Monthly Budget
+            <div className="bg-panel border border-border rounded-2xl p-6 lg:col-span-2">
+              <h2 className="font-display text-sm font-semibold mb-4 text-muted uppercase tracking-wide">
+                Set a Budget
               </h2>
-
-              <form
-                onSubmit={handleSetBudget}
-                className="flex flex-wrap gap-3 items-end"
-              >
+              <form onSubmit={handleSetBudget} className="flex flex-wrap gap-3 items-end">
                 <div>
-                  <label className="block text-sm text-slate-300 mb-1">
-                    Category
-                  </label>
-
+                  <label className="block text-xs text-muted mb-1.5">Category</label>
                   <input
                     type="text"
                     value={budgetCategory}
                     onChange={(e) => setBudgetCategory(e.target.value)}
                     placeholder="groceries"
                     required
-                    className="rounded-lg bg-slate-700 text-white px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="rounded-lg bg-panel-light border border-border text-text px-3 py-2 outline-none focus:border-gold/60 focus:ring-1 focus:ring-gold/40 transition-colors font-mono text-sm"
                   />
                 </div>
-
                 <div>
-                  <label className="block text-sm text-slate-300 mb-1">
-                    Monthly Limit
-                  </label>
-
+                  <label className="block text-xs text-muted mb-1.5">Monthly Limit</label>
                   <input
                     type="number"
                     value={budgetLimit}
@@ -175,16 +146,15 @@ function Dashboard() {
                     placeholder="3000"
                     min="0"
                     required
-                    className="rounded-lg bg-slate-700 text-white px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500 w-32"
+                    className="rounded-lg bg-panel-light border border-border text-text px-3 py-2 outline-none focus:border-gold/60 focus:ring-1 focus:ring-gold/40 transition-colors font-mono text-sm w-32"
                   />
                 </div>
-
                 <button
                   type="submit"
                   disabled={savingBudget}
-                  className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-medium rounded-lg px-4 py-2 transition-colors"
+                  className="bg-gold hover:bg-gold-dim disabled:opacity-50 text-ink font-semibold rounded-lg px-4 py-2 transition-colors text-sm"
                 >
-                  {savingBudget ? 'Saving...' : 'Save Budget'}
+                  {savingBudget ? 'Saving…' : 'Save Budget'}
                 </button>
               </form>
             </div>

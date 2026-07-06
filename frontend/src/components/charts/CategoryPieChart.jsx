@@ -1,12 +1,12 @@
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-const COLORS = ['#6366f1', '#ec4899', '#f59e0b', '#10b981', '#3b82f6', '#ef4444', '#8b5cf6', '#14b8a6'];
+const COLORS = ['#d4a857', '#2dd4bf', '#fb7185', '#8891a5', '#a9834a', '#5eead4', '#f9a8b4', '#4b5877'];
 
 function CategoryPieChart({ data }) {
   if (!data || data.length === 0) {
     return (
-      <div className="h-64 flex items-center justify-center text-slate-500 text-sm">
-        No expenses recorded this month yet.
+      <div className="h-64 flex items-center justify-center text-muted text-sm font-mono">
+        no expenses this month yet.
       </div>
     );
   }
@@ -27,8 +27,8 @@ function CategoryPieChart({ data }) {
             <Cell key={entry.category} fill={COLORS[index % COLORS.length]} />
           ))}
         </Pie>
-        <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: 8, color: '#fff' }} />
-        <Legend />
+        <Tooltip contentStyle={{ backgroundColor: '#111a2e', border: '1px solid #253252', borderRadius: 8, color: '#e8ecf3', fontFamily: 'JetBrains Mono, monospace', fontSize: 12 }} />
+        <Legend wrapperStyle={{ fontSize: 12, fontFamily: 'Inter, sans-serif' }} />
       </PieChart>
     </ResponsiveContainer>
   );
